@@ -54,7 +54,23 @@
     .group-button:hover {
       background-color: #415a77;
     }
-    /* منطقة السؤال */
+    /* مؤشر التقدم */
+    .progress-container {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .progress-circle {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: white;
+      display: inline-block;
+      margin: 0 3px;
+    }
+    .hidden {
+      display: none;
+    }
+    /* منطقة عرض السؤال */
     #quiz-container {
       margin-top: 20px;
     }
@@ -88,7 +104,7 @@
       cursor: pointer;
       border-radius: 5px;
       transition: background 0.3s ease;
-      width: 80%;
+      width: 90%;
     }
     .option-button:hover {
       background: #778da9;
@@ -122,11 +138,14 @@
         <h1>المعاكسات</h1>
       </div>
       
-      <!-- شاشة اختيار المجموعة (سيتم حذفها عند الضغط) -->
+      <!-- شاشة اختيار المجموعة -->
       <div id="group-selection" class="group-selection">
         <button class="group-button" onclick="startQuiz(1)">اليونت الاول</button>
         <button class="group-button" onclick="startQuiz(2)">اليونت الرابع والسابع</button>
       </div>
+
+      <!-- مؤشر التقدم (يخفي حتى بدء الاختبار) -->
+      <div id="progress-container" class="progress-container hidden"></div>
       
       <!-- منطقة عرض السؤال الواحد -->
       <div id="quiz-container" class="hidden"></div>
@@ -185,7 +204,7 @@
     let score = 0;
     let totalQuestions = 0;
     
-    // بدء الاختبار بناءً على اختيار المجموعة وإخفاء أزرار المجموعة عن طريق حذفها من الصفحة
+    // بدء الاختبار بناءً على اختيار المجموعة
     function startQuiz(groupNumber) {
       const groupSelection = document.getElementById("group-selection");
       if (groupSelection) {
@@ -195,6 +214,18 @@
       totalQuestions = currentQuestions.length;
       score = 0;
       currentQuestionIndex = 0;
+      
+      // إنشاء مؤشر التقدم (15 دائرة)
+      const progressContainer = document.getElementById("progress-container");
+      progressContainer.innerHTML = "";
+      for (let i = 0; i < totalQuestions; i++) {
+        const circle = document.createElement("div");
+        circle.className = "progress-circle";
+        circle.id = "progress-" + i;
+        progressContainer.appendChild(circle);
+      }
+      progressContainer.classList.remove("hidden");
+      
       showQuestion();
     }
     
@@ -257,12 +288,21 @@
           const btns = optionsDiv.querySelectorAll("button");
           btns.forEach(b => b.disabled = true);
           
+          // تحديث دائرة التقدم بناءً على الإجابة
+          const progressCircle = document.getElementById("progress-" + currentQuestionIndex);
+          
           if (option === target.correct) {
             btn.classList.add("correct");
+            if (progressCircle) {
+              progressCircle.classList.add("correct");
+            }
             score++;
             setTimeout(nextQuestion, 3000);
           } else {
             btn.classList.add("incorrect");
+            if (progressCircle) {
+              progressCircle.classList.add("incorrect");
+            }
             btns.forEach(b => {
               if (b.textContent === target.correct) {
                 b.classList.add("correct");
