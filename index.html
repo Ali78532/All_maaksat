@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>المعاكسات</title>
+  <style>
+    /* تصميم مائل للأزرق مع حجم خط أصغر قليلاً */
+    body {
+      background: #0d1b2a;
+      color: #e0e0e0;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      direction: rtl;
+      font-size: 16px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .header {
+      text-align: center;
+      padding: 20px 0;
+    }
+    .header h1 {
+      margin-bottom: 10px;
+      color: #ffffff; /* العنوان باللون الأبيض */
+    }
+    /* شاشة اختيار المجموعة */
+    .group-selection {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .group-button {
+      background-color: #1b263b;
+      color: #e0e0e0;
+      border: none;
+      padding: 15px;
+      margin: 10px 0;
+      width: 80%;
+      font-size: 1.2em;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+    .group-button:hover {
+      background-color: #415a77;
+    }
+    /* منطقة السؤال */
+    #quiz-container {
+      margin-top: 20px;
+    }
+    .question-container {
+      background: #1b263b;
+      border: 2px solid #415a77;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      direction: ltr;  /* عرض السؤال والاختيارات من اليسار لليمين */
+      text-align: center;  /* محاذاة السؤال في المنتصف */
+    }
+    /* السؤال باللون الأصفر */
+    .question-text {
+      font-size: 1.6em;
+      margin-bottom: 20px;
+      color: yellow;
+    }
+    .options {
+      display: flex;
+      flex-direction: column; /* عرض الاختيارات عموديًا */
+      align-items: center;
+    }
+    .option-button {
+      background: #415a77;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      margin: 8px 0;
+      font-size: 1.3em;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background 0.3s ease;
+      width: 80%;
+    }
+    .option-button:hover {
+      background: #778da9;
+    }
+    /* الإجابات: الصحيحة بلون أخضر والإجابات الخاطئة بلون أحمر */
+    .correct {
+      background-color: #2e8b57 !important;
+    }
+    .incorrect {
+      background-color: #8B0000 !important;
+    }
+    /* نتيجة الاختبار */
+    .result-container {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 1.2em; /* حجم خط أصغر */
+    }
+    /* العبارة تظهر في الأسفل */
+    .footer {
+      text-align: center;
+      padding: 10px 0;
+      font-size: 1em;
+      color: #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div>
+      <div class="header">
+        <h1>المعاكسات</h1>
+      </div>
+      
+      <!-- شاشة اختيار المجموعة (سيتم حذفها عند الضغط) -->
+      <div id="group-selection" class="group-selection">
+        <button class="group-button" onclick="startQuiz(1)">اليونت الاول</button>
+        <button class="group-button" onclick="startQuiz(2)">اليونت الرابع والسابع</button>
+      </div>
+      
+      <!-- منطقة عرض السؤال الواحد -->
+      <div id="quiz-container" class="hidden"></div>
+      
+      <!-- منطقة عرض النتيجة النهائية -->
+      <div id="result-container" class="hidden result-container"></div>
+    </div>
+    
+    <!-- العبارة تظهر في الأسفل -->
+    <div class="footer">
+      اعداد الاستاذ علي حسين
+    </div>
+  </div>
+  
+  <script>
+    // تعريف الأسئلة للمجموعتين
+    const group1 = [
+      { question: "terrible", correct: "fantastic" },
+      { question: "expensive", correct: "cheap" },
+      { question: "boring", correct: "fun" },
+      { question: "ugly", correct: "beautiful" },
+      { question: "dangerous", correct: "safe" },
+      { question: "old", correct: "new" },
+      { question: "unimportant", correct: "important" },
+      { question: "fat", correct: "thin" },
+      { question: "friendly", correct: "unfriendly" },
+      { question: "short", correct: "tall" },
+      { question: "stupid", correct: "clever" },
+      { question: "lazy", correct: "clever" },
+      { question: "awful", correct: "nice" },
+      { question: "uncomfortable", correct: "comfortable" },
+      { question: "happy", correct: "sad" }
+    ];
+    
+    const group2 = [
+      { question: "fast", correct: "slow" },
+      { question: "awful", correct: "nice" },
+      { question: "beautiful", correct: "ugly" },
+      { question: "dark", correct: "bright" },
+      { question: "cheap", correct: "expensive" },
+      { question: "dangerous", correct: "safe" },
+      { question: "happy", correct: "sad" },
+      { question: "hard working", correct: "lazy" },
+      { question: "noisy", correct: "quiet" },
+      { question: "old", correct: "young" },
+      { question: "happily", correct: "unhappily" },
+      { question: "slowly", correct: "fast" },
+      { question: "badly", correct: "well" },
+      { question: "comfortably", correct: "uncomfortably" },
+      { question: "in a friendly way", correct: "in an unfriendly way" }
+    ];
+    
+    // المتغيرات العامة
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let totalQuestions = 0;
+    
+    // بدء الاختبار بناءً على اختيار المجموعة وإخفاء أزرار المجموعة عن طريق حذفها من الصفحة
+    function startQuiz(groupNumber) {
+      const groupSelection = document.getElementById("group-selection");
+      if (groupSelection) {
+        groupSelection.remove();
+      }
+      currentQuestions = (groupNumber === 1) ? group1.slice() : group2.slice();
+      totalQuestions = currentQuestions.length;
+      score = 0;
+      currentQuestionIndex = 0;
+      showQuestion();
+    }
+    
+    // دالة لخلط عناصر المصفوفة
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+    
+    // الحصول على خيارات الإجابة (الإجابة الصحيحة وثلاثة مشتتات)
+    function getOptions(questionObj, pool) {
+      let options = [questionObj.correct];
+      let distractors = pool.filter(ans => ans !== questionObj.correct);
+      shuffle(distractors);
+      options = options.concat(distractors.slice(0, 3));
+      return shuffle(options);
+    }
+    
+    // عرض سؤال واحد فقط في الشاشة
+    function showQuestion() {
+      const quizContainer = document.getElementById("quiz-container");
+      quizContainer.innerHTML = "";
+      quizContainer.classList.remove("hidden");
+      // إزالة الخاصية القديمة للسماح بالضغط في السؤال الجديد
+      quizContainer.removeAttribute("data-answered");
+
+      if (currentQuestionIndex >= totalQuestions) {
+        showResult();
+        return;
+      }
+      
+      const target = currentQuestions[currentQuestionIndex];
+      
+      const questionDiv = document.createElement("div");
+      questionDiv.className = "question-container";
+      
+      const qText = document.createElement("div");
+      qText.className = "question-text";
+      qText.textContent = target.question;
+      questionDiv.appendChild(qText);
+      
+      const optionsDiv = document.createElement("div");
+      optionsDiv.className = "options";
+      
+      // تجميع الإجابات الصحيحة للمجموعة
+      const answerPool = currentQuestions.map(q => q.correct);
+      const options = getOptions(target, answerPool);
+      
+      options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.className = "option-button";
+        btn.textContent = option;
+        btn.addEventListener("click", function() {
+          if (quizContainer.getAttribute("data-answered") === "true") return;
+          quizContainer.setAttribute("data-answered", "true");
+          
+          const btns = optionsDiv.querySelectorAll("button");
+          btns.forEach(b => b.disabled = true);
+          
+          if (option === target.correct) {
+            btn.classList.add("correct");
+            score++;
+            setTimeout(nextQuestion, 3000);
+          } else {
+            btn.classList.add("incorrect");
+            btns.forEach(b => {
+              if (b.textContent === target.correct) {
+                b.classList.add("correct");
+              }
+            });
+            if (navigator.vibrate) {
+              navigator.vibrate(80);
+            }
+            setTimeout(nextQuestion, 5000);
+          }
+        });
+        optionsDiv.appendChild(btn);
+      });
+      
+      questionDiv.appendChild(optionsDiv);
+      quizContainer.appendChild(questionDiv);
+    }
+    
+    // الانتقال للسؤال التالي
+    function nextQuestion() {
+      currentQuestionIndex++;
+      showQuestion();
+    }
+    
+    // عرض النتيجة النهائية في منتصف الشاشة
+    function showResult() {
+      document.getElementById("quiz-container").classList.add("hidden");
+      const resultContainer = document.getElementById("result-container");
+      resultContainer.classList.remove("hidden");
+      resultContainer.innerHTML = `<h2>درجتك ${score} من ${totalQuestions}</h2>`;
+    }
+  </script>
+</body>
+</html>
